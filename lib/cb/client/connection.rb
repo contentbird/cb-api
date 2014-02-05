@@ -1,3 +1,5 @@
+require 'faraday'
+
 module CB::Client::Connection
 
   def get_connection args
@@ -12,11 +14,11 @@ module CB::Client::Connection
     end
     case result.status
     when 200
-      [true, JSON.parse(result.body).symbolize_keys]
+      [true, sym_keys(JSON.parse(result.body))]
     when 404
-      [false, JSON.parse(result.body).symbolize_keys]
+      [false, sym_keys(JSON.parse(result.body))]
     when 500
-      [false, JSON.parse(result.body).symbolize_keys]
+      [false, sym_keys(JSON.parse(result.body))]
     end
   end
 
@@ -28,7 +30,7 @@ module CB::Client::Connection
     end
     case result.status
     when 200
-      JSON.parse(result.body).symbolize_keys
+      sym_keys(JSON.parse(result.body))
     when 404
       raise CB::Client::NotFoundError, 'CB API Ressource not found'
     when 500
@@ -44,6 +46,19 @@ private
       req.options[:timeout]       = 5
       req.options[:open_timeout]  = 2
     end
+  end
+
+  def sym_keys hash
+    transfo_keys hash do |key|
+      key.to_sym rescue key
+    end
+  end
+
+  def transfo_keys hash, &block
+    hash.keys.each do |key|
+      hash[yield(key)] = hash.delete(key)
+    end
+    hash
   end
 
 end

@@ -48,11 +48,11 @@ class CB::Client::Session
 
 private
   def api_call verb, url, form_params, options
-    conn   = get_connection(url: CB_API_URL.to_s)
+    conn   = get_connection(url: CB::Client.configuration.api_url)
 
-    context = options[:context].try(:join, ',')
+    context = (options[:context].join(',') if options[:context].respond_to?(:join))
     (conn.params['context'] = context         ) if context
-    (conn.params['page']    = options[:page]  ) if options[:page].present?
+    (conn.params['page']    = options[:page]  ) if options[:page] && options[:page] != ''
 
     conn.headers['Accept']       = 'application/json'
     conn.headers['CB-KEY']       = key.to_s

@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency     'faraday',     '>= 0.8.8'
 
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'webmock'
 
   s.files                 = `git ls-files`.split("\n")
   s.test_files            = `git ls-files -- spec/*`.split("\n")
