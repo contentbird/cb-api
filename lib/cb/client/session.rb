@@ -58,11 +58,20 @@ private
     conn.headers['Accept']       = 'application/json'
     conn.headers['CB-KEY']       = key.to_s
     conn.headers['CB-SECRET']    = secret.to_s
-    if @raise
-      perform_request!(verb, conn, url, form_params)
+
+    if options[:only_curl]
+      api_curl_command verb, conn, url, form_params
     else
-      perform_request(verb, conn, url, form_params)
+      if @raise
+        perform_request!(verb, conn, url, form_params)
+      else
+        perform_request(verb, conn, url, form_params)
+      end
     end
+  end
+
+  def api_curl_command verb, conn, url, form_params
+    [true, "curl -X #{verb.to_s.upcase} '#{conn.build_url(url)}' -H 'Accept:#{conn.headers['Accept']}' -H 'CB-KEY:#{conn.headers['CB-KEY']}' -H 'CB-SECRET:#{conn.headers['CB-SECRET']}' -i"]
   end
 
 end

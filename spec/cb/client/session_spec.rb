@@ -12,11 +12,11 @@ describe CB::Client::Session do
     end
   end
 
-  describe '#get_api and #post_api' do
+  describe '#api_get and #api_post' do
     before do
       @headers = { 'CB-KEY' => subject.key, 'CB-SECRET' => subject.secret, 'Accept' => 'application/json'}
     end
-    describe '#get_api' do
+    describe '#api_get' do
       before do
         url                        = 'https://contentbird.herokuapp.com/api/some/url?context=some,data'
         paginated_url              = 'https://contentbird.herokuapp.com/api/some/url?context=some,data&page=3'
@@ -54,6 +54,13 @@ describe CB::Client::Session do
         @stubbed_request.to_timeout
 
         subject.send(:api_get, '/api/some/url', context: [:some, :data]).should eq [false, {message: 'Timeout'}]
+      end
+
+      it 'does not call the API and returns a curl command if only_curl: true is passed in the options' do
+        @stubbed_paginated_request.should_not have_been_requested
+
+        subject.send(:api_get, '/api/some/url', context: [:some, :data], page: 3, only_curl: true)
+               .should eq [true, "curl -X GET 'https://contentbird.herokuapp.com/api/some/url?context=some%2Cdata&page=3' -H 'Accept:application/json' -H 'CB-KEY:id' -H 'CB-SECRET:token' -i"]
       end
 
       context 'given a session in raise_error mode' do
@@ -168,4 +175,5 @@ describe CB::Client::Session do
       subject.create_section_content('my-section', {'some' => 'data'}, context: [:sections, :html]).should eq [true, {content: 'data'}]
     end
   end
+
 end
