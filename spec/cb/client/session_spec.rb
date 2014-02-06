@@ -28,26 +28,26 @@ describe CB::Client::Session do
         @stubbed_request.to_return(status: 200, body:   {result: ['two', 'contents'], sections: ['two', 'sections']}.to_json)
         @stubbed_paginated_request.to_return(status: 200, body:   {result: ['page 3', 'contents'], sections: ['two', 'sections']}.to_json)
 
-        subject.api_get('/api/some/url', context: [:some, :data]).should eq [true, {result: ['two', 'contents'], sections: ['two', 'sections']}]
-        subject.api_get('/api/some/url', context: [:some, :data], page: 3).should eq [true, {result: ['page 3', 'contents'], sections: ['two', 'sections']}]
+        subject.send(:api_get, '/api/some/url', context: [:some, :data]).should eq [true, {result: ['two', 'contents'], sections: ['two', 'sections']}]
+        subject.send(:api_get, '/api/some/url', context: [:some, :data], page: 3).should eq [true, {result: ['page 3', 'contents'], sections: ['two', 'sections']}]
       end
 
       it 'returns error with message when WS replies with 404' do
         @stubbed_request.to_return(status: 404, body: {message: 'no channel with this prefix'}.to_json)
 
-        subject.api_get('/api/some/url', context: [:some, :data]).should eq [false, {message: 'no channel with this prefix'}]
+        subject.send(:api_get, '/api/some/url', context: [:some, :data]).should eq [false, {message: 'no channel with this prefix'}]
       end
 
       it 'returns WS message when WS replies with 500' do
         @stubbed_request.to_return(status: 500, body:   {message: 'an error occurred'}.to_json)
 
-        subject.api_get('/api/some/url', context: [:some, :data]).should eq [false, {message: 'an error occurred'}]
+        subject.send(:api_get, '/api/some/url', context: [:some, :data]).should eq [false, {message: 'an error occurred'}]
       end
 
       it 'returns timeout message when WS timeout' do
         @stubbed_request.to_timeout
 
-        subject.api_get('/api/some/url', context: [:some, :data]).should eq [false, {message: 'Timeout'}]
+        subject.send(:api_get, '/api/some/url', context: [:some, :data]).should eq [false, {message: 'Timeout'}]
       end
 
       context 'given a session in raise_error mode' do
@@ -58,25 +58,25 @@ describe CB::Client::Session do
         it 'returns only the API response body, without splatting with a success flag' do
           @stubbed_request.to_return(status: 200, body:   {result: ['two', 'contents'], sections: ['two', 'sections']}.to_json)
 
-          @client.api_get('/api/some/url', context: [:some, :data]).should eq({result: ['two', 'contents'], sections: ['two', 'sections']})
+          @client.send(:api_get, '/api/some/url', context: [:some, :data]).should eq({result: ['two', 'contents'], sections: ['two', 'sections']})
         end
 
         it 'raises a CB exception when WS replies with 404' do
           @stubbed_request.to_return(status: 404, body: {message: 'no channel with this prefix'}.to_json)
 
-          expect { @client.api_get('/api/some/url', context: [:some, :data]) }.to raise_error(CB::Client::NotFoundError)
+          expect { @client.send(:api_get, '/api/some/url', context: [:some, :data]) }.to raise_error(CB::Client::NotFoundError)
         end
 
         it 'raises a CB exception when WS replies with 500' do
           @stubbed_request.to_return(status: 500, body: {message: 'an error occurred'}.to_json)
 
-          expect { @client.api_get('/api/some/url', context: [:some, :data]) }.to raise_error(CB::Client::AppError)
+          expect { @client.send(:api_get, '/api/some/url', context: [:some, :data]) }.to raise_error(CB::Client::AppError)
         end
 
         it 'raises a CB exception timeout when WS timeout' do
           @stubbed_request.to_timeout
 
-          expect {@client.api_get('/api/some/url', context: [:some, :data])}.to raise_error(CB::Client::TimeoutError)
+          expect {@client.send(:api_get, '/api/some/url', context: [:some, :data])}.to raise_error(CB::Client::TimeoutError)
         end
       end
     end
@@ -91,7 +91,7 @@ describe CB::Client::Session do
       it 'makes an HTTP request to the given url using its credentials and forwarding the given options params' do
         @stubbed_request.to_return(status: 200, body:   {result: ['two', 'contents'], sections: ['two', 'sections']}.to_json)
 
-        subject.api_post('/api/some/url', @post_params, context: [:some, :data]).should eq [true, {result: ['two', 'contents'], sections: ['two', 'sections']}]
+        subject.send(:api_post, '/api/some/url', @post_params, context: [:some, :data]).should eq [true, {result: ['two', 'contents'], sections: ['two', 'sections']}]
       end
     end
 

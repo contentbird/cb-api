@@ -38,6 +38,8 @@ class CB::Client::Session
     api_get "/api/contents/#{content_slug}", options
   end
 
+private
+
   def api_get url, options
     api_call :get, url, nil, options
   end
@@ -46,7 +48,6 @@ class CB::Client::Session
     api_call :post, url, form_params, options
   end
 
-private
   def api_call verb, url, form_params, options
     conn   = get_connection(url: CB::Client.configuration.api_url)
 
