@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/contentbird/cb-api"
   s.license = ""
 
-  s.add_runtime_dependency     'faraday',     '>= 0.8.8'
+  s.add_runtime_dependency     'faraday',     '~> 0.8.8'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'webmock'
