@@ -32,6 +32,12 @@ describe CB::Client::Session do
         subject.send(:api_get, '/api/some/url', context: [:some, :data], page: 3).should eq [true, {result: ['page 3', 'contents'], sections: ['two', 'sections']}]
       end
 
+      it 'returns error with message when WS replies with 403' do
+        @stubbed_request.to_return(status: 403, body: {message: 'no channel matching your credentials'}.to_json)
+
+        subject.send(:api_get, '/api/some/url', context: [:some, :data]).should eq [false, {message: 'no channel matching your credentials'}]
+      end
+
       it 'returns error with message when WS replies with 404' do
         @stubbed_request.to_return(status: 404, body: {message: 'no channel with this prefix'}.to_json)
 
@@ -59,6 +65,12 @@ describe CB::Client::Session do
           @stubbed_request.to_return(status: 200, body:   {result: ['two', 'contents'], sections: ['two', 'sections']}.to_json)
 
           @client.send(:api_get, '/api/some/url', context: [:some, :data]).should eq({result: ['two', 'contents'], sections: ['two', 'sections']})
+        end
+
+        it 'raises a CB exception when WS replies with 443' do
+          @stubbed_request.to_return(status: 403, body: {message: 'No channel matches your credentials'}.to_json)
+
+          expect { @client.send(:api_get, '/api/some/url', context: [:some, :data]) }.to raise_error(CB::Client::ForbiddenError)
         end
 
         it 'raises a CB exception when WS replies with 404' do

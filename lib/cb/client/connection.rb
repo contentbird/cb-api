@@ -15,6 +15,8 @@ module CB::Client::Connection
     case result.status
     when 200
       [true, sym_keys(JSON.parse(result.body))]
+    when 403
+      [false, sym_keys(JSON.parse(result.body))]
     when 404
       [false, sym_keys(JSON.parse(result.body))]
     when 500
@@ -31,6 +33,8 @@ module CB::Client::Connection
     case result.status
     when 200
       sym_keys(JSON.parse(result.body))
+    when 403
+      raise CB::Client::ForbiddenError, 'CB API Bad credentials'
     when 404
       raise CB::Client::NotFoundError, 'CB API Ressource not found'
     when 500
