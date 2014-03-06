@@ -2,11 +2,12 @@ class CB::Client::Session
 
   include CB::Client::Connection
 
-  attr_reader :key, :secret
+  attr_reader :key, :secret, :locale
 
-  def initialize key, secret, raise_errors=true
+  def initialize key, secret, locale, raise_errors=true
     @key    = key
     @secret = secret
+    @locale = locale
     @raise  = raise_errors
   end
 
@@ -55,9 +56,10 @@ private
     (conn.params['context'] = context         ) if context
     (conn.params['page']    = options[:page]  ) if options[:page] && options[:page] != ''
 
-    conn.headers['Accept']       = 'application/json'
-    conn.headers['CB-KEY']       = key.to_s
-    conn.headers['CB-SECRET']    = secret.to_s
+    conn.headers['Accept']          = 'application/json'
+    conn.headers['Accept-Language'] = locale.to_s if locale
+    conn.headers['CB-KEY']          = key.to_s
+    conn.headers['CB-SECRET']       = secret.to_s
 
     if options[:only_curl]
       api_curl_command verb, conn, url, form_params
@@ -71,7 +73,7 @@ private
   end
 
   def api_curl_command verb, conn, url, form_params
-    [true, "curl -X #{verb.to_s.upcase} '#{conn.build_url(url)}' -H 'Accept:#{conn.headers['Accept']}' -H 'CB-KEY:#{conn.headers['CB-KEY']}' -H 'CB-SECRET:#{conn.headers['CB-SECRET']}' -i"]
+    [true, "curl -X #{verb.to_s.upcase} '#{conn.build_url(url)}' -H 'Accept:#{conn.headers['Accept']}' -H 'Accept-Language:#{conn.headers['Accept-Language']}' -H 'CB-KEY:#{conn.headers['CB-KEY']}' -H 'CB-SECRET:#{conn.headers['CB-SECRET']}' -i"]
   end
 
 end

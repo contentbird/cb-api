@@ -3,7 +3,7 @@ require 'json'
 
 describe CB::Client::Session do
 
-  subject { CB::Client::Session.new('id', 'token', false) }
+  subject { CB::Client::Session.new('id', 'token', nil, false) }
 
   describe '#initialize' do
     it 'creates a new Client service object with given key and secret' do
@@ -60,12 +60,12 @@ describe CB::Client::Session do
         @stubbed_paginated_request.should_not have_been_requested
 
         subject.send(:api_get, '/api/some/url', context: [:some, :data], page: 3, only_curl: true)
-               .should eq [true, "curl -X GET 'https://contentbird.herokuapp.com/api/some/url?context=some%2Cdata&page=3' -H 'Accept:application/json' -H 'CB-KEY:id' -H 'CB-SECRET:token' -i"]
+               .should eq [true, "curl -X GET 'https://contentbird.herokuapp.com/api/some/url?context=some%2Cdata&page=3' -H 'Accept:application/json' -H 'Accept-Language:' -H 'CB-KEY:id' -H 'CB-SECRET:token' -i"]
       end
 
       context 'given a session in raise_error mode' do
         before do
-          @client = CB::Client::Session.new('id', 'token')
+          @client = CB::Client::Session.new('id', 'token', nil)
         end
 
         it 'returns only the API response body, without splatting with a success flag' do
